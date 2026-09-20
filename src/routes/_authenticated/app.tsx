@@ -20,10 +20,12 @@ export const Route = createFileRoute("/_authenticated/app")({
 });
 
 function AppPage() {
-  const { user } = Route.useRouteContext();
+  const { user, queryClient } = Route.useRouteContext();
   const navigate = useNavigate();
 
   async function handleSignOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
     await supabase.auth.signOut();
     await navigate({ to: "/auth", replace: true });
   }
