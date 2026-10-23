@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link } from "react-router";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { ArrowRight } from "lucide-react";
@@ -24,7 +24,7 @@ export function LandingHeader() {
           <span className="sm:hidden"><BrandMark compact /></span>
         </Link>
         <Button asChild size="lg">
-          <Link to={user ? "/app" : "/auth"}>
+          <Link to={user ? "/app" : "/sign-in"}>
             {user ? "Dashboard / 儀表板" : "Sign in / 登入"}
             <ArrowRight aria-hidden="true" />
           </Link>

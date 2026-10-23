@@ -48,23 +48,31 @@ Tasteful subtle animations (fade-in on scroll is fine; don't overdo it)
 
 Out of scope for this v1: route-subscription form, target-price input, fare display, payment, custom database tables (do NOT create a subscriptions or profiles table — only use Supabase's default auth.users). Those come in later milestones. Stick to landing page + auth + placeholder dashboard.
 
-This project was built with [Lovable](https://lovable.dev).
+## Stack
 
-## Build with Lovable
+Plain **Vite + React SPA** (no SSR), client-side routing with **React Router 7**, Tailwind CSS 4 + shadcn/ui, Supabase auth. Originally scaffolded with [Lovable](https://lovable.dev) on TanStack Start; converted to a static SPA for Vercel.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/98bcc716-a9b1-4a42-a7c4-c5afb5c2f8ca).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+| Route | Page |
+| --- | --- |
+| `/` | Landing page |
+| `/sign-in` | Sign in (`/auth` redirects here) |
+| `/sign-up` | Sign up |
+| `/app` | Dashboard — requires a session, otherwise redirects to `/sign-in` |
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # typecheck + static build → dist/
+npm run preview    # serve dist/ locally
 ```
+
+Environment variables (inlined at build time, see `.env`):
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+## Deploying to Vercel
+
+Import the repo in Vercel — `vercel.json` sets the Vite framework preset, `npm run build`, output `dist/`, and a rewrite of every non-file path to `/index.html` so deep links like `/app` resolve client-side. Add the two `VITE_*` variables in **Project → Settings → Environment Variables**, and add your Vercel domain to the Supabase project's allowed redirect URLs.

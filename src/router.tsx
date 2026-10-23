@@ -1,16 +1,44 @@
-import { QueryClient } from "@tanstack/react-query";
-import { createRouter } from "@tanstack/react-router";
-import { routeTree } from "./routeTree.gen";
+import { createBrowserRouter, redirect, type RouteObject } from "react-router";
 
-export const getRouter = () => {
-  const queryClient = new QueryClient();
+import { RootLayout } from "@/components/RootLayout";
+import { RouteError } from "@/components/RouteError";
+import { AuthForm } from "@/components/AuthForm";
+import { supabase } from "@/integrations/supabase/client";
+import { AUTHENTICATED_ROUTE_ID } from "@/lib/route-ids";
+import { IndexPage } from "@/pages/IndexPage";
+import { AppPage } from "@/pages/AppPage";
+import { NotFoundPage } from "@/pages/NotFoundPage";
 
-  const router = createRouter({
-    routeTree,
-    context: { queryClient },
-    scrollRestoration: true,
-    defaultPreloadStaleTime: 0,
-  });
+// Client-only guard (replaces the old TanStack `_authenticated` beforeLoad).
+async function requireUser() {
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) throw redirect("/sign-in");
+  return { user: data.user };
+}
 
-  return router;
-};
+export const routes: RouteObject[] = [
+  {
+    element: <RootLayout />,
+    errorElement: <RouteError />,
+    hydrateFallbackElement: <div className="min-h-screen bg-background" />,
+    children: [
+      { path: "/", element: <IndexPage /> },
+      {
+        // Pathless layout so the form keeps its state when toggling Sign In ↔ Sign Up.
+        element: <AuthForm />,
+        children: [{ path: "/sign-in" }, { path: "/sign-up" }],
+      },
+      // Legacy URL from the TanStack version.
+      { path: "/auth", loader: () => redirect("/sign-in") },
+      {
+        id: AUTHENTICATED_ROUTE_ID,
+        loader: requireUser,
+        shouldRevalidate: () => false,
+        children: [{ path: "/app", element: <AppPage /> }],
+      },
+      { path: "*", element: <NotFoundPage /> },
+    ],
+  },
+];
+
+export const router = createBrowserRouter(routes);

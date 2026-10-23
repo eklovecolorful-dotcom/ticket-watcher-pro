@@ -1,33 +1,30 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import type { User } from "@supabase/supabase-js";
+import { Link, useNavigate, useRouteLoaderData } from "react-router";
 import { BellRing, LogOut, Plane, Radar } from "lucide-react";
 
 import { BrandMark } from "@/components/BrandMark";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { usePageMeta } from "@/lib/page-meta";
+import { AUTHENTICATED_ROUTE_ID } from "@/lib/route-ids";
 
-export const Route = createFileRoute("/_authenticated/app")({
-  head: () => ({
-    meta: [
-      { title: "Dashboard — Flight Price Notifier" },
-      { name: "description", content: "Your private Flight Price Notifier dashboard." },
-      { property: "og:title", content: "Dashboard — Flight Price Notifier" },
-      { property: "og:description", content: "Manage your flight price alerts." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: AppPage,
-});
-
-function AppPage() {
-  const { user, queryClient } = Route.useRouteContext();
+export function AppPage() {
+  const { user } = useRouteLoaderData(AUTHENTICATED_ROUTE_ID) as { user: User };
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  usePageMeta({
+    title: "Dashboard — Flight Price Notifier",
+    description: "Your private Flight Price Notifier dashboard.",
+    ogDescription: "Manage your flight price alerts.",
+  });
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
     await supabase.auth.signOut();
-    await navigate({ to: "/auth", replace: true });
+    await navigate("/sign-in", { replace: true });
   }
 
   return (

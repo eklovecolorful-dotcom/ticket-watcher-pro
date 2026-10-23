@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useMatch, useNavigate } from "react-router";
 import { FormEvent, useEffect, useState } from "react";
 import { ArrowLeft, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
 
@@ -7,20 +7,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { usePageMeta } from "@/lib/page-meta";
 
 type Mode = "sign-in" | "sign-up";
 
 export function AuthForm() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<Mode>("sign-in");
+  // Mode comes from the URL: /sign-in or /sign-up.
+  const mode: Mode = useMatch("/sign-up") ? "sign-up" : "sign-in";
+  const setMode = (next: Mode) => {
+    if (next !== mode) void navigate(`/${next}`, { replace: true });
+  };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  usePageMeta({
+    title: `${mode === "sign-in" ? "Sign In" : "Sign Up"} — Flight Price Notifier`,
+    description: "Sign in or create your Flight Price Notifier account.",
+    ogDescription: "Access your flight price alert dashboard.",
+  });
+
   useEffect(() => {
     void supabase.auth.getUser().then(({ data }) => {
-      if (data.user) void navigate({ to: "/app", replace: true });
+      if (data.user) void navigate("/app", { replace: true });
     });
   }, [navigate]);
 
@@ -39,7 +50,7 @@ export function AuthForm() {
       return;
     }
 
-    await navigate({ to: "/app", replace: true });
+    await navigate("/app", { replace: true });
   }
 
   return (

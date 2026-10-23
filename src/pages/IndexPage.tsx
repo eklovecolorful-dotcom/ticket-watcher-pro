@@ -1,23 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router";
 import { ArrowRight, BellRing, Eye, Plane, XCircle } from "lucide-react";
 
 import heroImage from "@/assets/taipei-night-flight.jpg";
 import { LandingHeader } from "@/components/LandingHeader";
 import { Button } from "@/components/ui/button";
+import { usePageMeta } from "@/lib/page-meta";
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Flight Price Notifier — 機票降價通知" },
-      { name: "description", content: "設定航線與目標價，機票降價就通知你。從台北出發，低於預算就收到 email。" },
-      { property: "og:title", content: "Flight Price Notifier — 機票降價通知" },
-      { property: "og:description", content: "Set a route and a target price — we email you when the fare drops." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: Index,
-});
 
 const features = [
   { icon: Eye, title: "盯緊熱門航線", en: "Always-on route watching", body: "持續監控台北出發的熱門航線（東京、首爾），自動抓最低票價。", number: "01" },
@@ -25,7 +13,13 @@ const features = [
   { icon: XCircle, title: "隨時取消", en: "Cancel anytime", body: "月訂閱制，不想用隨時停，沒有綁約。", number: "03" },
 ];
 
-function Index() {
+export function IndexPage() {
+  usePageMeta({
+    title: "Flight Price Notifier — 機票降價通知",
+    description: "設定航線與目標價，機票降價就通知你。從台北出發，低於預算就收到 email。",
+    ogDescription: "Set a route and a target price — we email you when the fare drops.",
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <LandingHeader />
@@ -41,7 +35,7 @@ function Index() {
             <p className="mt-7 max-w-2xl text-xl font-medium leading-relaxed text-foreground sm:text-2xl">設定航線與目標價，機票降價就通知你</p>
             <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">Set a route and a target price — we email you when the fare drops.</p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Button asChild size="lg"><Link to="/auth">Start watching fares <ArrowRight aria-hidden="true" /></Link></Button>
+              <Button asChild size="lg"><Link to="/sign-in">Start watching fares <ArrowRight aria-hidden="true" /></Link></Button>
               <span className="text-xs text-muted-foreground">Tokyo · Seoul · More routes soon</span>
             </div>
           </div>
